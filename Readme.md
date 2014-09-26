@@ -1,6 +1,7 @@
 # butterfly
 
 [![Build Status](https://travis-ci.org/nowk/butterfly.svg?branch=master)](https://travis-ci.org/nowk/butterfly)
+[![GoDoc](https://godoc.org/github.com/nowk/butterfly?status.svg)](http://godoc.org/github.com/nowk/butterfly)
 
 Transform through pipe
 
