@@ -14,14 +14,22 @@ func (f TransformFunc) Transform(w io.Writer, r io.Reader) error {
 // the Source and pipes them through each stage and writes out to the final
 // destination
 type Cocoon struct {
-	stages []TransformFunc
-	Source io.Reader
+	stages   []TransformFunc
+	Source   io.Reader
+	bytesize int
 }
 
 // NewCocoon returns a new Cocoon
 func NewCocoon(r io.Reader) *Cocoon {
+	return NewCocoonSize(r, 32*1024)
+}
+
+// NewCocoonSize returns a new Cocoon whose final read size will be the given
+// number
+func NewCocoonSize(r io.Reader, n int) *Cocoon {
 	return &Cocoon{
-		Source: r,
+		Source:   r,
+		bytesize: n,
 	}
 }
 
@@ -48,16 +56,16 @@ func (c *Cocoon) Write(out io.Writer) (int, error) {
 		r = p
 	}
 
-	return write(out, r)
+	return write(out, r, c.bytesize)
 }
 
 // write is the last stage, this writes to the final source
-func write(w io.Writer, r io.Reader) (int, error) {
+func write(w io.Writer, r io.Reader, bytesize int) (int, error) {
 	i := 0
 
 Write:
 	for {
-		b := make([]byte, 32*1024) // TODO customize read size
+		b := make([]byte, bytesize)
 		n, err := r.Read(b)
 		if err == io.EOF || n == 0 {
 			break Write
