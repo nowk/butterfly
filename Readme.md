@@ -10,10 +10,10 @@ Transform through pipe
     in, _ := os.Open("./words.txt")
     out, _ := os.Create("transformed.txt")
 
-    tr := butterfly.NewCocoon(in)
+    tr := butterfly.NewTransform(in)
     tr.Through(UpperCase)
     tr.Through(Reversed)
-    n, err := tr.Write(out)
+    n, err := tr.WriteTo(out)
     if err != nil {
       // handle error
     }
