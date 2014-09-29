@@ -37,15 +37,15 @@ func Uhoh(w io.Writer, r io.Reader) error {
 	return fmt.Errorf("something broke")
 }
 
-func TestCocoon(t *testing.T) {
+func TestTransform(t *testing.T) {
 	r := strings.NewReader("Dear, ")
 	var b []byte
 	buf := bytes.NewBuffer(b)
 
-	tr := NewCocoon(r)
+	tr := NewTransform(r)
 	tr.Through(Hello)
 	tr.Through(World)
-	n, err := tr.Write(buf)
+	n, err := tr.WriteTo(buf)
 
 	assert.Nil(t, err)
 	assert.Equal(t, 18, n)
@@ -57,7 +57,7 @@ func TestCocoon(t *testing.T) {
 // 	var b []byte
 // 	buf := bytes.NewBuffer(b)
 
-// 	tr := NewCocoon(r)
+// 	tr := NewTransform(r)
 // 	tr.Through(Hello)
 // 	tr.Through(Uhoh)
 // 	tr.Through(World)

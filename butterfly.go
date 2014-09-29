@@ -10,37 +10,37 @@ func (f TransformFunc) Transform(w io.Writer, r io.Reader) error {
 	return f(w, r)
 }
 
-// Cocoon is a struct around a collection of transform functions. Which takes
+// Transform is a struct around a collection of transform functions. Which takes
 // the Source and pipes them through each stage and writes out to the final
 // destination
-type Cocoon struct {
+type Transform struct {
 	stages   []TransformFunc
 	Source   io.Reader
 	bytesize int
 }
 
-// NewCocoon returns a new Cocoon
-func NewCocoon(r io.Reader) *Cocoon {
-	return NewCocoonSize(r, 32*1024)
+// NewTransform returns a new Transform
+func NewTransform(r io.Reader) *Transform {
+	return NewTransformSize(r, 32*1024)
 }
 
-// NewCocoonSize returns a new Cocoon whose final read size will be the given
+// NewTransformSize returns a new Transform whose final read size will be the given
 // number
-func NewCocoonSize(r io.Reader, n int) *Cocoon {
-	return &Cocoon{
+func NewTransformSize(r io.Reader, n int) *Transform {
+	return &Transform{
 		Source:   r,
 		bytesize: n,
 	}
 }
 
 // Through stacks TransformFuncs to be piped through on Write
-func (c *Cocoon) Through(fn TransformFunc) *Cocoon {
+func (c *Transform) Through(fn TransformFunc) *Transform {
 	c.stages = append(c.stages, fn)
 	return c
 }
 
-// Write writes to the final output after being piped through the stages
-func (c *Cocoon) Write(out io.Writer) (int, error) {
+// WriteTo writes to the final output after being piped through the stages
+func (c *Transform) WriteTo(out io.Writer) (int, error) {
 	r := c.Source
 
 	for _, fn := range c.stages {
@@ -56,11 +56,11 @@ func (c *Cocoon) Write(out io.Writer) (int, error) {
 		r = p
 	}
 
-	return write(out, r, c.bytesize)
+	return writeto(out, r, c.bytesize)
 }
 
-// write is the last stage, this writes to the final source
-func write(w io.Writer, r io.Reader, bytesize int) (int, error) {
+// writeto is the last stage, this writes to the final source
+func writeto(w io.Writer, r io.Reader, bytesize int) (int, error) {
 	i := 0
 
 Write:
