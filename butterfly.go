@@ -66,19 +66,21 @@ func writeto(w io.Writer, r io.Reader, bytesize int) (int, error) {
 Write:
 	for {
 		b := make([]byte, bytesize)
-		n, err := r.Read(b)
-		if err == io.EOF || n == 0 {
+		n, er := r.Read(b)
+		if n > 0 {
+			m, ew := w.Write(b[:n])
+			i += m
+			if ew != nil {
+				return i, ew
+			}
+		}
+
+		if er == io.EOF || n == 0 {
 			break Write
 		}
 
-		if err != nil {
-			return i, err
-		}
-
-		m, err := w.Write(b[:n])
-		i += m
-		if err != nil {
-			return i, err
+		if er != nil {
+			return i, er
 		}
 	}
 
